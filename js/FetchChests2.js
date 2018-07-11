@@ -38,19 +38,19 @@ function countChests(chestTable){
 
 //récupère les coffres pleins dans une pièces et ses sous pièces
 function countChestsInRooms(chestTable, addressRoot, roomObject){
-	
+	var chestNow = chestTable;
 	var currentRoom = roomObject;
 	if (currentRoom != null) {
 
 		//gestion des coffres de la pièce
-
+		
 		var chestsInRoom = currentRoom.chests;
 		var chestUrl = "";
 
 		console.log("Room : " + currentRoom.id);
 		for (var i = 0; i< chestsInRoom.length;i++){
 			chestUrl = addressRoot + chestsInRoom[i];
-			requestElements(chestUrl, checkChests, chestTable, addressRoot);
+			chestNow = requestElements(chestUrl, checkChests, chestNow, addressRoot);
 			//console.log(chestUrl);
 			//checkChests(chestTable,chestUrl);
 		}
@@ -60,16 +60,17 @@ function countChestsInRooms(chestTable, addressRoot, roomObject){
 		
 		for (var i = 0; i< subrooms.length;i++){
 			subroomUrl =  addressRoot + subrooms[i];
-			requestElements(subroomUrl, countChestsInRooms, chestTable, addressRoot);
+			chestNow = requestElements(subroomUrl, countChestsInRooms, chestNow, addressRoot);
 			// console.log(subrooms[i]);
 		}
 	}
 	
-	
+	return chestNow;
 }
 
 function checkChests(chestTable, addressRoot, chestObject){
-	//requestElements(address);//var currentChest = 
+	//requestElements(address);//var currentChest =
+	var chestNow = chestTable;
 	var currentChest = chestObject;
 	var chestStatus;
 	if (currentChest != null){
@@ -77,16 +78,16 @@ function checkChests(chestTable, addressRoot, chestObject){
 		 
 		 if (chestStatus !== "This chest is empty :/ Try another one!"){
 		 	console.log("TREASURE CHEST FOUND !!!! " + currentChest.id);
-		 	chestTable.push(currentChest.id);
+		 	chestNow.push(currentChest.id);
 		 }
 	}
-
+	return chestNow;
 }
 
 function requestElements(address, callback, chestTable, basicAddress){
 	
 	//var currentObject;
-
+	var chestNow = chestTable;
 	var httpRequest = new XMLHttpRequest();
 	//appel en asynchrone (faire passer des arguments en parametre)
 	var args = Array.prototype.slice.call(arguments,2);
@@ -104,7 +105,7 @@ function requestElements(address, callback, chestTable, basicAddress){
 	httpRequest.open("GET", address, true);
 	httpRequest.setRequestHeader("content-type", "application/json")
 	httpRequest.send();
-
+	return chestNow;
 }
 
 
